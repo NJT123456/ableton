@@ -8,6 +8,7 @@ export default {
     extend: {
       transitionProperty: {
         padding: "padding",
+        position: "position",
       },
     },
   },

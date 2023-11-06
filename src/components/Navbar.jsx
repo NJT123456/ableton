@@ -1,5 +1,5 @@
 import "@/static/Navbar.css";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { signal } from "@preact/signals-react";
 import { useEffect, useRef } from "react";
@@ -108,12 +108,21 @@ const Navbar = ({ classnames }) => {
   const moreFromRef = useRef(null);
   const scroll = useRef(null);
 
+  const location = useLocation();
+
+  useEffect(() => {
+    // เมื่อเส้นทางเปลี่ยนแปลง
+    showMore.value = false;
+  }, [location.pathname]);
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1028) {
         showLinks.value = true;
+        showMore.value = false;
       } else {
         showLinks.value = false;
+        showMore.value = true;
       }
     };
 
@@ -160,6 +169,13 @@ const Navbar = ({ classnames }) => {
     }
   };
 
+  const isLocationMatching = (pathname) => {
+    const allHrefs = [...links.link_more_on, ...links.link_from].map(
+      (item) => item.href
+    );
+    return allHrefs.includes(pathname);
+  };
+
   return (
     <>
       <nav
@@ -195,51 +211,70 @@ const Navbar = ({ classnames }) => {
 
           <div
             key={showLinks.value}
-            className="w-full h-0 bg-[#0000ff] lg:w-auto overflow-hidden transition-all lg:flex text-base font-bold lg:items-center lg:bg-transparent"
+            className={`bg-[#0000ff] lg:!h-auto lg:w-full overflow-hidden h-0 transition-all lg:flex text-base font-bold lg:items-center lg:bg-transparent`}
             ref={linksContainer}>
             <ul
-              className="mt-0 w-full flex link-a lg:flex-row flex-col lg:space-x-8 lg:items-center lg:justify-between"
+              className="mt-0 w-full flex link-a lg:flex-row flex-col lg:space-x-6 lg:items-center lg:justify-between"
               ref={linksRef}>
-              <div className="flex px-4 lg:flex-row flex-col lg:space-x-8 lg:items-center">
+              <div className="flex px-4 lg:flex-row flex-col lg:space-x-6 lg:items-center">
                 {links.link_header.map((linkItem, index) => (
                   <li key={index} className="pb-4 lg:pb-0">
-                    <Link to={"#"} className="md:block w-full md:h-full">
+                    <Link
+                      to={"#"}
+                      className={`md:block w-full md:h-full ${
+                        location.pathname === linkItem.link
+                          ? "text-orange-400"
+                          : ""
+                      }`}>
                       {linkItem.link}
                     </Link>
                   </li>
                 ))}
                 <li className="hidden lg:block" onClick={showAllMore}>
-                  <Link to={"#"} className="flex items-center justify-center">
+                  <Link
+                    to={"#"}
+                    className={`flex items-center justify-center ${
+                      isLocationMatching(location.pathname)
+                        ? "text-orange-400"
+                        : null
+                    }`}>
                     More{" "}
                     <div className="mt-[1px] ml-1 flex">
-                      <i className="bx bx-plus text-[16px]" />
+                      <i
+                        className={`bx bx-${
+                          showMore.value ? "minus" : "plus"
+                        } text-[16px]`}
+                      />
                     </div>
                   </Link>
                 </li>
               </div>
-              <div className="flex px-4 lg:flex-row flex-col lg:space-x-8 lg:items-center">
-                <li className="lg:text-[#0000ff] pb-4 lg:pb-0 text-lg lg:text-base">
+              <div className="flex px-4 lg:flex-row flex-col lg:space-x-6 lg:items-center">
+                <li className="lg:text-[#0000ff] pb-4 lg:pb-0 text-lg lg:text-sm">
                   <Link to={"#"}>Try Live for free</Link>
                 </li>
-                <li className=" pb-4 lg:pb-0">
+                <li className="pb-4 lg:pb-0 lg:text-sm">
                   <Link to={"#"}>Log in or register</Link>
                 </li>
               </div>
             </ul>
             {/* click More + to show  */}
-            {showMore.value || showLinks.value ? (
-              <div className="px-4" ref={moreFromRef}>
-                <section className="h-auto">
+            {showMore.value && showLinks.value ? (
+              <div
+                className="px-4 pb-4 lg:p-4 lg:absolute lg:left-0 lg:right-0 lg:top-20 lg:bg-white"
+                ref={moreFromRef}>
+                <section className="h-auto lg:pb-4">
                   <h3 className="text-lg pb-4">More on Ableton.com:</h3>
-                  <ul className="w-full flex link-a lg:flex-row flex-col lg:space-x-8 lg:items-center">
+                  <ul className="w-full flex link-a lg:flex-row flex-col lg:space-x-4 lg:items-center">
                     {links.link_more_on.map((linkItem, index) => (
                       <li key={index} className="pb-4 lg:pb-0">
                         <Link
                           to={`${linkItem.href}`}
-                          style={{
-                            color: showLinks.value ? "white" : "black",
-                          }}
-                          className="link-more-on-ab">
+                          className={`lg:font-normal ${
+                            location.pathname === linkItem.href
+                              ? "text-orange-400"
+                              : null
+                          }`}>
                           {linkItem.link}
                         </Link>
                       </li>
@@ -265,10 +300,12 @@ const Navbar = ({ classnames }) => {
                   </div>
                   <div>
                     <ul
-                      className="w-full flex link-a flex-row lg:space-x-8 lg:items-center snap-x snap-mandatory overflow-x-auto scrollbar-none"
+                      className="w-full flex link-a flex-row lg:space-x-8 snap-x snap-mandatory overflow-x-auto scrollbar-none"
                       ref={scroll}>
                       {links.link_from.map((linkItem, idx) => (
-                        <li key={idx} className="min-w-[15em] mr-4 pb-4">
+                        <li
+                          key={idx}
+                          className="min-w-[15em] mr-4 lg:mr-0 pb-4">
                           <Link to={linkItem.href}>
                             <div>
                               <h4>{linkItem.header}</h4>

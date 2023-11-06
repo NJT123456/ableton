@@ -11,6 +11,6 @@
   transform: rotate(180deg);
 }
 
-.link-a a{
+.link-a a {
   @apply transition-all;
 }
