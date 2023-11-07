@@ -142,9 +142,8 @@ const Navbar = ({ classnames }) => {
 
       if (showLinks.value) {
         linksContainer.current.style.height = `${totalHeight}px`;
-      } else {
-        linksContainer.current.style.height = "0px";
-      }
+        
+      } 
     }
   }, [showLinks.value]);
 
@@ -181,7 +180,7 @@ const Navbar = ({ classnames }) => {
       <nav
         className={`h-20 ${
           showLinks.value
-            ? "bg-[#0000ff] text-white lg:bg-white lg:border-b-2 lg:border-solid lg:border-[#eee] lg:text-black"
+            ? "bg-[#0000ff] relative z-20 text-white lg:bg-white lg:border-b-2 lg:border-solid lg:border-[#eee] lg:text-black"
             : "bg-white border-b-2 border-solid border-[#eee] text-black"
         } ${classnames}`}>
         <div className="relative lg:flex lg:h-full lg:p-4 lg:items-center">
@@ -211,7 +210,7 @@ const Navbar = ({ classnames }) => {
 
           <div
             key={showLinks.value}
-            className={`bg-[#0000ff] lg:!h-auto lg:w-full overflow-hidden h-0 transition-all lg:flex text-base font-bold lg:items-center lg:bg-transparent`}
+            className={`bg-[#0000ff] lg:!h-auto lg:w-full overflow-hidden  h-0 duration-[0.15s] transition-all lg:flex text-base font-bold lg:items-center lg:bg-transparent`}
             ref={linksContainer}>
             <ul
               className="mt-0 w-full flex link-a lg:flex-row flex-col lg:space-x-6 lg:items-center lg:justify-between"
@@ -264,7 +263,7 @@ const Navbar = ({ classnames }) => {
                 className="px-4 pb-4 lg:p-4 lg:absolute lg:left-0 lg:right-0 lg:top-20 lg:bg-white"
                 ref={moreFromRef}>
                 <section className="h-auto lg:pb-4">
-                  <h3 className="text-lg pb-4">More on Ableton.com:</h3>
+                  <h3 className="text-lg pb-4 mb-0">More on Ableton.com:</h3>
                   <ul className="w-full flex link-a lg:flex-row flex-col lg:space-x-4 lg:items-center">
                     {links.link_more_on.map((linkItem, index) => (
                       <li key={index} className="pb-4 lg:pb-0">

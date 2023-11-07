@@ -1,10 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .more-link {
   display: none;
 }
 
 .down-arrow {
   transform: rotate(0deg);
-  transition: all 0.15s linear 75ms;
+  transition: all 0.15s linear;
 }
 
 .active-arrow {
