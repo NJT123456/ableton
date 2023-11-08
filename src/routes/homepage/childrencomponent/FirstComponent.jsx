@@ -1,29 +1,51 @@
-import { effect, signal } from "@preact/signals-react";
 import { Link } from "react-router-dom";
-
-const showScrollDown = signal(true);
+import $ from "jquery";
+import { effect } from "@preact/signals-react";
+import { useRef } from "react";
 
 export const FirstComponent = () => {
+  const downIcon = useRef(null);
   effect(() => {
-    const getSectionId = document.getElementById('blog')
-    const handleScroll = () => {
-      if (window.scrollY >= getSectionId.offsetTop()) {
-        showScrollDown.value = true;
+    const checkScreen = () => {
+      const blogsection = document.getElementById("blog");
+      if (blogsection) {
+        const blogRect = blogsection.getBoundingClientRect();
+        
+        if (window.innerWidth < 1028 || blogRect.top < window.innerHeight && blogRect.bottom > 0) {
+          downIcon.current.style.display = "none";
+        } else {
+          downIcon.current.style.display = "flex";
+        }
       } else {
-        showScrollDown.value = true;
+        // กรณีไม่มี element ที่มี id="blog"
+        downIcon.current.style.display = "flex";
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", checkScreen);
+    window.addEventListener("resize", checkScreen);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      // นำออก event listeners เมื่อ component unmount
+      window.removeEventListener("scroll", checkScreen);
+      window.removeEventListener("resize", checkScreen);
     };
   });
 
+  const handleClick = () => {
+    const blogSectionId = "#blog";
+
+    $("html, body").animate(
+      {
+        scrollTop: $(blogSectionId).offset().top,
+      },
+      1000
+    );
+  };
+
   return (
     <>
-      <div className="lg:float-left lg:w-[58.33vw] xl:w-[881.33px]">
+      <div className="lg:float-left lg:w-[58.33vw] xl:w-[933.33px]">
         <article className="relative bg-hp-image1 bg-no-repeat bg-center bg-cover w-full pb-[66.67%] cursor-pointer mb-[8.33vw] lg:mb-0">
           <Link
             to={"#"}
@@ -37,7 +59,7 @@ export const FirstComponent = () => {
         </article>
       </div>
       {/* img2 */}
-      <div className="w-[91.67vw] ml-[8.33vw] lg:float-right mt-[16.67vw] lg:w-[33.33vw] xl:w-[533.33px] xl:mt-[239.67px]">
+      <div className="w-[91.67vw] ml-[8.33vw] lg:ml-0 lg:float-right mt-[16.67vw] lg:w-[33.33vw] xl:w-[533.33px] xl:mt-[266.67px]">
         <article className="relative bg-hp-image2 bg-no-repeat bg-center bg-cover pb-[66.67%]">
           <Link
             to={"#"}
@@ -65,11 +87,15 @@ export const FirstComponent = () => {
         </article>
       </div>
 
-      {showScrollDown && window.innerWidth >= 1028 && (
-        <div className="z-10 cursor-pointer overflow-hidden bg-[#0000ff] fixed bottom-0 w-[60px] h-[60px] text-base whitespace-nowrap flex items-center justify-center transition-[bottom]">
+      <div className="w-full flex items-center justify-center" ref={downIcon}>
+        <div
+          className="z-10 cursor-pointer overflow-hidden bg-[#0000ff] fixed bottom-0 w-[60px] h-[60px] text-base whitespace-nowrap flex items-center justify-center transition-[bottom]"
+          onClick={handleClick}
+          id="down-icon"
+          >
           <i className="bx bx-chevron-down text-white text-5xl"></i>
         </div>
-      )}
+      </div>
     </>
   );
 };
